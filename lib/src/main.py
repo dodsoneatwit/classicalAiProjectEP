@@ -20,7 +20,7 @@ warnings.filterwarnings('ignore')
 os.environ['TF_ENABLE_ONEDNN_OPTS'] = '0'  # Suppresses most messages, showing only errors
 tf.get_logger().setLevel('ERROR')         # Ensures that only errors are outputted
 # reading cleaned twitter dataset
-df = pd.read_csv('lib/data/Cleaned_Tweets_Dataset.csv')
+df = pd.read_csv('../data/Cleaned_Tweets_Dataset.csv')
 
 # tokenizing tweets with TF-IDF
 tfidf = TfidfVectorizer(strip_accents=None, lowercase=False, preprocessor=None)
@@ -29,28 +29,18 @@ y = df['value']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3)
 
 # loading logistic regression trained model (Eli's path: '../models/logistic_regression_model.pkl')
-log_reg = joblib.load('lib/models/logistic_regression_model.pkl') 
+log_reg = joblib.load('../models/logistic_regression_model.pkl') 
 
 # loading support vector classification trained model (Eli's path: '../models/support_vector_classification_model.pkl')
-svc = joblib.load('lib/models/support_vector_classification_model.pkl')
+svc = joblib.load('../models/support_vector_classification_model.pkl')
 
 # Assuming RandomForest is added
-rf_model = joblib.load('lib/models/random_forest_model.pkl')  # Load RandomForest model
+rf_model = joblib.load('../models/random_forest_model.pkl')  # Load RandomForest model
 
 # prediction
 log_prediction = log_reg.predict(X_test)
 svc_prediction = svc.predict(X_test)
 rf_prediction = rf_model.predict(X_test)  # RandomForest prediction
-
-# accuracy scores
-log_accuracy = accuracy_score(log_prediction, y_test)
-svc_accuracy = accuracy_score(svc_prediction, y_test)
-rf_accuracy = accuracy_score(rf_prediction, y_test)  # RandomForest accuracy
-
-# Print accuracy scores for traditional models
-print(f"Logistic Regression Accuracy Score: {log_accuracy}")
-print(f"Support Vector Classification Accuracy Score: {svc_accuracy}")
-print(f"Random Forest Accuracy Score: {rf_accuracy}")
 
 # Prepare data for LSTM (requires sequence data)
 tokenizer = Tokenizer(num_words=1000)
@@ -60,14 +50,22 @@ X_seq = pad_sequences(sequences, maxlen=100)  # Using max length of 100, adjust 
 X_train_seq, X_test_seq, y_train_seq, y_test_seq = train_test_split(X_seq, y, test_size=0.3, random_state=42)
 
 # Load LSTM model
-lstm_model = load_model('lib/models/sentiment_lstm_model.keras')
+lstm_model = load_model('../models/sentiment_lstm_model.keras')
 
 # LSTM prediction
 lstm_prediction = lstm_model.predict(X_test_seq)
 lstm_prediction = (lstm_prediction > 0.5).astype(int)
 
-# Calculate LSTM accuracy
+# Calculate accuracy scores
+log_accuracy = accuracy_score(log_prediction, y_test)
+svc_accuracy = accuracy_score(svc_prediction, y_test)
+rf_accuracy = accuracy_score(rf_prediction, y_test)  # RandomForest accuracy
 lstm_accuracy = accuracy_score(lstm_prediction, y_test_seq)
 
-# Print LSTM accuracy score
+print()
+
+# Print accuracy scores
+print(f"Logistic Regression Accuracy Score: {log_accuracy}")
+print(f"Support Vector Classification Accuracy Score: {svc_accuracy}")
+print(f"Random Forest Accuracy Score: {rf_accuracy}")
 print(f"LSTM Model Accuracy Score: {lstm_accuracy}")
