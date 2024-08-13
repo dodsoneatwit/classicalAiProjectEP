@@ -37,10 +37,15 @@ svc = joblib.load('../models/support_vector_classification_model.pkl')
 # Assuming RandomForest is added
 rf_model = joblib.load('../models/random_forest_model.pkl')  # Load RandomForest model
 
-# prediction
-log_prediction = log_reg.predict(X_test)
-svc_prediction = svc.predict(X_test)
-rf_prediction = rf_model.predict(X_test)  # RandomForest prediction
+# test prediction 
+log_prediction_test = log_reg.predict(X_test)
+svc_prediction_test = svc.predict(X_test)
+rf_prediction_test = rf_model.predict(X_test)  # RandomForest prediction
+
+# test prediction 
+log_prediction_train = log_reg.predict(X_train)
+svc_prediction_train = svc.predict(X_train)
+rf_prediction_train = rf_model.predict(X_train)  # RandomForest prediction
 
 # Prepare data for LSTM (requires sequence data)
 tokenizer = Tokenizer(num_words=1000)
@@ -52,20 +57,38 @@ X_train_seq, X_test_seq, y_train_seq, y_test_seq = train_test_split(X_seq, y, te
 # Load LSTM model
 lstm_model = load_model('../models/sentiment_lstm_model.keras')
 
-# LSTM prediction
-lstm_prediction = lstm_model.predict(X_test_seq)
-lstm_prediction = (lstm_prediction > 0.5).astype(int)
+# test LSTM prediction
+lstm_prediction_test = lstm_model.predict(X_test_seq)
+lstm_prediction_test = (lstm_prediction_test > 0.5).astype(int)
 
-# Calculate accuracy scores
-log_accuracy = accuracy_score(log_prediction, y_test)
-svc_accuracy = accuracy_score(svc_prediction, y_test)
-rf_accuracy = accuracy_score(rf_prediction, y_test)  # RandomForest accuracy
-lstm_accuracy = accuracy_score(lstm_prediction, y_test_seq)
+# test LSTM prediction
+lstm_prediction_train = lstm_model.predict(X_train_seq)
+lstm_prediction_train = (lstm_prediction_train > 0.5).astype(int)
+
+# Calculate accuracy scores for test sets
+log_accuracy_test = accuracy_score(log_prediction_test, y_test)
+svc_accuracy_test = accuracy_score(svc_prediction_test, y_test)
+rf_accuracy_test = accuracy_score(rf_prediction_test, y_test)  # RandomForest accuracy
+lstm_accuracy_test = accuracy_score(lstm_prediction_test, y_test_seq)
+
+# Calculate accuracy scores for test sets
+log_accuracy_train = accuracy_score(log_prediction_train, y_train)
+svc_accuracy_train = accuracy_score(svc_prediction_train, y_train)
+rf_accuracy_train = accuracy_score(rf_prediction_train, y_train)  # RandomForest accuracy
+lstm_accuracy_train = accuracy_score(lstm_prediction_train, y_train_seq)
 
 print()
 
-# Print accuracy scores
-print(f"Logistic Regression Accuracy Score: {log_accuracy}")
-print(f"Support Vector Classification Accuracy Score: {svc_accuracy}")
-print(f"Random Forest Accuracy Score: {rf_accuracy}")
-print(f"LSTM Model Accuracy Score: {lstm_accuracy}")
+# Print accuracy test scores
+print(f"Testing Logistic Regression Accuracy Score: {log_accuracy_test}")
+print(f"Testing Support Vector Classification Accuracy Score: {svc_accuracy_test}")
+print(f"Testing Random Forest Accuracy Score: {rf_accuracy_test}")
+print(f"Testing LSTM Model Accuracy Score: {lstm_accuracy_test}")
+
+print()
+
+# Print accuracy test scores
+print(f"Training Logistic Regression Accuracy Score: {log_accuracy_train}")
+print(f"Training Support Vector Classification Accuracy Score: {svc_accuracy_train}")
+print(f"Training Random Forest Accuracy Score: {rf_accuracy_train}")
+print(f"Training LSTM Model Accuracy Score: {lstm_accuracy_train}")
